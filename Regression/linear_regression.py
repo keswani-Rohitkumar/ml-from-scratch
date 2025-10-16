@@ -19,32 +19,27 @@ class LinearRegression:
         for i in range(self.num_iter):
             y_predicted = np.dot(X, self.weights) + self.bias
             error = y_predicted - y
-            
-            dw = (1 / n_samples) * np.dot(X.T, (y_predicted - y))
-            db = (1 / n_samples) * np.sum(y_predicted - y)
+            dw = (1 / n_samples) * np.dot(X.T, error)
+            db = (1 / n_samples) * np.sum(error)
 
             if self.l1_lambda > 0:
-                dw+= self.l1_lambda *np.sign(self.weights)
+                dw+= (self.l1_lambda / n_samples)*np.sign(self.weights)
             
             if self.l2_lambda > 0:
-                dw+= self.l2_lambda * self.weights
-
+                dw+= (self.l2_lambda / n_samples)* self.weights
+            
             self.weights -= self.lr * dw
             self.bias -= self.lr * db
-
-            loss = np.mean(error ** 2)
+            loss = (1/ (2*n_samples)) * np.sum(error**2)
             if self.l1_lambda > 0:
-                loss += self.l1_lambda * np.sum(np.abs(self.weights))
+                loss += (self.l1_lambda / n_samples) * np.sum(np.abs(self.weights))
             if self.l2_lambda > 0:
-                loss+= self.l2_lambda * np.sum(np.abs(self.weights) ** 2)
+                loss+= (self.l2_lambda/ (2*n_samples)) * np.sum(self.weights ** 2)
 
-            print(self.weights, self.bias)
             self.losses.append(loss)
 
             if i % 100 == 0:
                 print(f"Iteration {i}, Loss: {loss:.4f}")
         
-
-
     def predict(self, X):
         return np.dot(X, self.weights) + self.bias
